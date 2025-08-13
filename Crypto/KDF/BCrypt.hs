@@ -117,7 +117,6 @@ bcrypt cost salt password = B.concat [header, B.snoc costBytes dollar, b64 salt,
             , zero + fromIntegral (realCost `mod` 10)
             ]
     realCost
-        | cost < 4 = 10 -- 4 is virtually pointless so go for 10
         | cost > 31 = 31
         | otherwise = cost
 
@@ -201,7 +200,7 @@ parseBCryptHash bc = do
     unless
         (version == 'b' || version == 'a' || version == 'y')
         (Left ("Unsupported minor version: " ++ [version]))
-    when (costTens > 3 || cost > 31 || cost < 4) (Left "Invalid bcrypt cost")
+    when (costTens > 3 || cost > 31) (Left "Invalid bcrypt cost")
     (salt, hash) <- decodeSaltHash (B.drop 7 bc)
     return (BCH version cost salt hash)
   where
